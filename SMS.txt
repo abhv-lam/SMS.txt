@@ -1,0 +1,227 @@
+Declare Sub OPENSUB()
+Declare sub CREATESUB()
+Declare sub UPDATESUB(n$)
+Declare sub DELETESUB(n$)
+Declare sub APPENDSUB(n$)
+Declare function LFILL$(n$)
+
+
+Color , 1
+Cls
+main:
+Color 15
+Print LFILL$("|")
+
+Print
+Print
+Print
+
+Color 13
+Print Tab(28); "Student Management System"
+ws$ = "         "
+
+Print
+Color 11
+Print Tab(36); "COMMANDS$"
+Print
+Color 10
+Print Tab(22); "Open"; ws$; "Create"; ws$;
+Color 12
+Print "Exit."
+
+Color 14
+Print Tab(22); "  Update"
+Print Tab(22); "  Delete"
+Print Tab(22); "  Append"
+
+Print
+Print
+
+Color 15
+Print LFILL$("|")
+Print LFILL$("_")
+Print
+
+
+
+
+top:
+Color 15
+Input "Enter Command>"; n$
+If LCase$(n$) = "open" Then
+    Call OPENSUB
+    Cls
+    GoTo main
+ElseIf LCase$(n$) = "create" Then
+    Call CREATESUB
+    Cls
+    GoTo main
+ElseIf LCase$(n$) = "exit" Then
+    Cls
+    Color , 0
+    Cls
+    Close
+    End
+Else
+    Color 12
+    Print "illegal command"
+    GoTo top
+End If
+
+End
+
+
+
+
+
+Sub OPENSUB
+    Input "Enter the 'to be opened' file name"; n$
+    top:
+    Open n$ For Input As #1
+    Cls
+    Print LFILL$("_")
+    Color 11
+    Print
+    Print Tab(40 - Len(n$) / 2); n$
+    Print
+    Color 10
+    Print Tab(3); "SN", "Name", "Address", "Rollno", "Class"
+    Color 15
+    n = 0
+    While Not EOF(1)
+        n = n + 1
+        Input #1, name$, address$, rollno, class
+        Print Tab(2); n, name$, address$, rollno, class
+    Wend
+    Print
+    Color 15
+    Print LFILL$("_")
+    Print LFILL$("|")
+    Print
+    Close #1
+    Color 14
+    Print "'Update' / 'Delete' / 'Append' ?"
+    Input ">"; m$
+    If LCase$(m$) <> "exit" Then
+        If LCase$(m$) = "update" Then
+            Call UPDATESUB(n$)
+            GoTo top
+        ElseIf LCase$(m$) = "delete" Then
+            Call DELETESUB(n$)
+            GoTo top
+        ElseIf LCase$(m$) = "Append" Then
+            Call APPENDSUB(n$)
+            GoTo top
+        Else
+            Color 12
+            Print "illegal command"
+            GoTo top
+        End If
+    End If
+End Sub
+
+Sub CREATESUB
+    Input "New file name"; n$
+    Open n$ For Output As #1
+    Cls
+    Print LFILL$("_")
+    Color 11
+    Print
+    Print Tab(40 - Len(n$) / 2); n$
+    Print
+    Color 10
+    Print "   Name,"; "Address,"; "Rollno,"; "Class"
+    Color 15
+    top:
+    Input ">"; name$, address$, rollno, class
+    If LCase$(name$) <> "end" And address$ <> "" And rollno <> 0 And class <> 0 Then
+        Write #1, name$, address$, rollno, class
+        GoTo top
+    Else
+        Print LFILL$("|")
+    End If
+    Close #1
+    Color 11
+    Input "Press any key to continue"; x$
+End Sub
+
+
+
+
+Sub UPDATESUB (n$)
+    Open n$ For Input As #2
+    Open "$" + n$ For Output As #3
+    Input "enter SN"; sn
+
+    While Not EOF(2)
+        n = n + 1
+        If n = sn Then
+            Print
+            Print
+            Input #2, name$, address$, rollno, class
+            Print "   Name,"; "Address,"; "Rollno,"; "Class"
+            Input ">"; name$, address$, rollno, class
+            Write #3, name$, address$, rollno, class
+        Else
+            Input #2, name$, address$, rollno, class
+            Write #3, name$, address$, rollno, class
+        End If
+    Wend
+    Close #2
+    Close #3
+    Kill n$
+    Name "$" + n$ As n$
+End Sub
+
+
+
+
+Sub DELETESUB (n$)
+    Open n$ For Input As #2
+    Open "$" + n$ For Output As #3
+    Input "enter SN"; sn
+
+    While Not EOF(2)
+        n = n + 1
+        If n = sn Then
+            Input #2, name$, address$, rollno, class
+        Else
+            Input #2, name$, address$, rollno, class
+            Write #3, name$, address$, rollno, class
+        End If
+    Wend
+    Close #2
+    Close #3
+    Kill n$
+    Name "$" + n$ As n$
+
+End Sub
+
+
+
+
+Sub APPENDSUB (n$)
+    Open n$ For Append As #2
+    Color 10
+    Print "   Name,"; "Address,"; "Rollno,"; "Class"
+    Color 15
+    top:
+    Input ">"; name$, address$, rollno, class
+    If LCase$(name$) <> "Exit" And address$ <> "" And rollno <> 0 And class <> 0 Then
+        Write #2, name$, address$, rollno, class
+        GoTo top
+    End If
+    Close #2
+    Color 11
+    Input "Press any key to continue"; x$
+End Sub
+
+
+
+
+Function LFILL$ (n$)
+    For i = 1 To 80
+        x$ = x$ + n$
+    Next i
+    LFILL$ = x$
+End Function
